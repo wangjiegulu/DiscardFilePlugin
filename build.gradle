@@ -3,9 +3,9 @@
 buildscript {
     repositories {
         jcenter()
-//        maven{
-//            url uri('/Users/wangjie/.m2/repository')
-//        }
+        maven{
+            url uri('/Users/wangjie/.m2/repository')
+        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.3.0'

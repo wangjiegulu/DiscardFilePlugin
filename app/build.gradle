@@ -9,7 +9,7 @@ apply plugin: DiscardFilePlugin
 
 discard {
     includePackagePath 'com.wangjie.plg.discardfile.sample.ui', 'com.wangjie.plg.discardfile.sample.include'
-    excludePackagePath 'com.wangjie.plg.discardfile.sample.exclude', 'com.wangjie.plg.discardfile.sample.ui.MainActivity'
+    excludePackagePath 'com.wangjie.plg.discardfile.sample.exclude'/*, 'com.wangjie.plg.discardfile.sample.ui.MainActivity'*/
 }
 
 android {
@@ -27,6 +27,13 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    productFlavors {
+        panel {
+        }
+        full {
         }
     }
 
@@ -48,4 +55,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.0.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     testCompile 'junit:junit:4.12'
+
+    compile project(':discardfile-api')
 }
