@@ -15,7 +15,7 @@ configurations.all {
 
 apply plugin: 'maven'
 group='com.wangjie.plg'
-version='1.0.0-SNAPSHOT'
+version='1.0.0-rc-2-SNAPSHOT'
 
 uploadArchives {
     repositories {

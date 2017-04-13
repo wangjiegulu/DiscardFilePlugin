@@ -46,8 +46,10 @@ public class DiscardFileTransform extends Transform {
     void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
         super.transform(transformInvocation)
         long start = System.currentTimeMillis();
-//        def discardFile = project['discard']
-//        println ">>>>>>>>>>>>" + discardFile.includePackagePath + ", " + discardFile.excludePackagePath
+
+        println("+-----------------------------------------------------------------------------+");
+        println("|                      Discard File Transform START                           |");
+        println("+-----------------------------------------------------------------------------+");
 
         // Transform的inputs有两种类型，一种是目录，一种是jar包，要分开遍历
 
@@ -80,7 +82,7 @@ public class DiscardFileTransform extends Transform {
             input.directoryInputs.each { DirectoryInput directoryInput ->
                 // 文件夹里面包含的是我们手写的类以及R.class、BuildConfig.class以及R$XXX.class等
 
-                println(">>>>>>>>>>>>>>>> dir name: " + directoryInput.file)
+//                println(">>>>>>>>>>>>>>>> dir name: " + directoryInput.file)
                 // 进行class注入
                 DiscardInject.applyInject(project, directoryInput.file.getAbsolutePath())
 
@@ -99,6 +101,9 @@ public class DiscardFileTransform extends Transform {
         }
 
         println("[DiscardFilePlugin] -> Discard file transform takes: " + (System.currentTimeMillis() - start) + "ms")
+        println("+-----------------------------------------------------------------------------+");
+        println("|                       Discard File Transform END                            |");
+        println("+-----------------------------------------------------------------------------+");
     }
 
 

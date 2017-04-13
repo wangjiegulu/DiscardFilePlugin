@@ -1,5 +1,7 @@
 package com.wangjie.plg.discardfile
 
+import com.android.annotations.NonNull
+import com.android.annotations.Nullable
 import com.wangjie.plg.discardfile.api.annotation.Discard
 import com.wangjie.plg.discardfile.api.constant.DiscardConstant
 import javassist.ClassPool
@@ -22,7 +24,7 @@ public class DiscardInject {
         )
 
         def discardFile = project['discard']
-        println "[DiscardFilePlugin] -> discardFile: " + discardFile.includePackagePath + ", " + discardFile.excludePackagePath
+        println "[DiscardFilePlugin] -> Configuration: " + discardFile.includePackagePath + ", " + discardFile.excludePackagePath
 
         dir.eachFileRecurse { File file ->
             String filePath = file.absolutePath
@@ -38,43 +40,49 @@ public class DiscardInject {
                     }
 //                    println "classNamePath: " + classNamePath
                     if (isValidateFile(discardFile, classNamePath)) {
-                        String className = classNamePath.replaceAll("/", ".").replace(".class", "")
-//                        println "[DiscardFilePlugin] -> className: " + className
-
-                        CtClass c = pool.get(className)
-                        if (c.isFrozen()) {
-                            c.defrost()
+                        String className = classNamePath.replaceAll("/", ".")
+                        if (className.endsWith(".class")) {
+                            className = className.substring(0, className.length() - 6)
                         }
-                        CtMethod[] ctMethods = c.getMethods();
-                        int ctMethodsLength = ctMethods.length;
-                        for (int i = 0; i < ctMethodsLength; i++) {
-                            CtMethod ctMethod = ctMethods[i];
+                        CtClass ctClass = pool.get(className)
+                        if (ctClass.isFrozen()) {
+                            ctClass.defrost()
+                        }
 
-                            if (ctMethod.hasAnnotation(Discard.class)) {
-                                Discard discard = ctMethod.getAnnotation(Discard.class)
+                        /*
+                         * If Add @Discard annotation at Class, discard all declared methods
+                         */
+                        Discard classDiscard = ctClass.getAnnotation(Discard.class);
+                        if (null != classDiscard) {
+                            if (!isApplyDiscard(project, classDiscard, "Discard class : " + ctClass.getName())) {
+                                println("[DiscardFilePlugin] -> [NOT APPLIED]Discard class : " + className)
+                            } else {
+                                discardClass(ctClass, classDiscard);
+                                ctClass.writeFile(dirPath)
+                                println("[DiscardFilePlugin] -> [APPLIED]Discard class : " + className)
+                            }
+                        } else {
+                            /*
+                             * Get all of methods that has @Discard annotations
+                             */
+                            CtMethod[] ctMethods = ctClass.getDeclaredMethods();
+                            int ctMethodsLength = ctMethods.length;
+                            for (int i = 0; i < ctMethodsLength; i++) {
+                                CtMethod ctMethod = ctMethods[i];
 
-                                String applyParam = discard.applyParam()
-                                String applyParamValue = System.getProperty(applyParam);
-                                println("[DiscardFilePlugin] -> applyParam: " + applyParam + ", applyParamValue: " + applyParamValue)
-                                if (null == applyParamValue || !"true".equalsIgnoreCase(applyParamValue)) {
-                                    println("[DiscardFilePlugin] -> [NOT APPLY]Discard method : " + className + "::" + ctMethod.getName() + "()")
-                                    continue
+                                Discard methodDiscard = ctMethod.getAnnotation(Discard.class)
+                                if (null != methodDiscard) {
+                                    if (!isApplyDiscard(project, methodDiscard, "Discard method : " + ctMethod.getLongName())) {
+                                        println("[DiscardFilePlugin] -> [NOT APPLIED]Discard method : " + ctMethod.getLongName())
+                                        continue
+                                    }
+                                    println("[DiscardFilePlugin] -> [APPLIED]Discard method : " + ctMethod.getLongName())
+                                    discardMethod(ctMethod, methodDiscard)
+                                    ctClass.writeFile(dirPath)
                                 }
-                                makeClasses(discard)
-
-                                String srcCode = discard.srcCode();
-                                if (null == srcCode || srcCode.length() < 2) {
-                                    srcCode = getDefaultSrcCode(ctMethod)
-                                }
-
-                                println("[DiscardFilePlugin] -> Discard method : " + className + "::" + ctMethod.getName() + "()")
-
-                                ctMethod.setBody(srcCode)
-                                c.writeFile(dirPath)
-                                c.detach()
                             }
                         }
-
+                        ctClass.detach()
 
                     }
                 }
@@ -85,7 +93,48 @@ public class DiscardInject {
 
     }
 
-    private static void makeClasses(Discard discard) {
+    private static void discardClass(CtClass ctClass, @NonNull Discard discard) {
+        tryMakeClasses(discard)
+        CtMethod[] ctMethods = ctClass.getDeclaredMethods();
+        int ctMethodsLength = ctMethods.length;
+        for (int i = 0; i < ctMethodsLength; i++) {
+            CtMethod ctMethod = ctMethods[i];
+            discardMethod(ctMethod, ctMethod.getAnnotation(Discard.class))
+        }
+    }
+
+    private static void discardMethod(CtMethod ctMethod, @Nullable Discard discard) {
+        String srcCode = null;
+        if (null != discard) {
+            // Cancel this discard if it is disabled.
+            if (!discard.enable()) {
+                return;
+            }
+            tryMakeClasses(discard)
+            srcCode = discard.srcCode()
+        }
+
+        if (null == srcCode || srcCode.length() < 2) {
+            srcCode = getDefaultSrcCode(ctMethod)
+        }
+
+        ctMethod.setBody(srcCode)
+
+    }
+
+    private static boolean isApplyDiscard(Project project, Discard discard, String tag) {
+        String applyParam = discard.applyParam()
+        String applyParamExpectValue = discard.applyParamValue()
+        String applyParamValue = getParameter(project, applyParam);
+
+        if (null == applyParamValue || applyParamExpectValue != applyParamValue) {
+            println("[DiscardFilePlugin] -> [NOT APPLIED PARAM]" + tag + ", applyParam: " + applyParam + ", applyParamExpectValue: " + applyParamExpectValue + ", applyParamValue: " + applyParamValue)
+            return false;
+        }
+        return true;
+    }
+
+    private static void tryMakeClasses(Discard discard) {
         String[] paramMakeClassNames = discard.makeClassNames();
         if (null != paramMakeClassNames) {
             int paramMakeClassLen = paramMakeClassNames.length;
@@ -142,6 +191,19 @@ public class DiscardInject {
         } else {
             return "{ return null; }"
         }
+    }
+
+    private static String getParameter(Project project, String key) {
+        // -D
+        String value = System.getProperty(key)
+        if (null != value && value.length() > 0) {
+            return value
+        }
+        // -P
+        if (project.hasProperty(key)) {
+            return project.property(key)
+        }
+        return null
     }
 
 }
