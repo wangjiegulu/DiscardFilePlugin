@@ -89,7 +89,7 @@ public class IncludeClassC {
 **在`Release`环境下**编译完成之后，该类的`class`文件将会根据配置的`@Discard`注解被自动修改成如下：
 
 ```
-build/intermediates/classes/../release/.../IncludeClassC.class
+build/intermediates/transforms/discardFile/release/folders/.../IncludeClassC.class
 ```
 
 ```java

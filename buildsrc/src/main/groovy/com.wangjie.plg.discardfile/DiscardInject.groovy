@@ -19,8 +19,14 @@ public class DiscardInject {
             return
         }
 
+        project.
+                println "[DiscardFilePlugin] inject dirPath: " + dirPath
         System.setProperty(DiscardConstant.APPLY_PARAM_DEFAULT,
-                String.valueOf(dirPath.endsWith("/release"))
+                String.valueOf(
+                        dirPath.endsWith("/release")
+                                ||
+                                dirPath.contains("/release/")
+                )
         )
 
         def discardFile = project['discard']
