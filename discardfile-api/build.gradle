@@ -13,22 +13,6 @@ configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
-apply plugin: 'maven'
-group='com.wangjie.plg'
-version='1.0.0-rc-2-SNAPSHOT'
-
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            //提交到远程服务器：
-            // repository(url: "http://www.xxx.com/repos") {
-            //    authentication(userName: "admin", password: "admin")
-            // }
-            //本地的Maven地址设置为D:/repos
-            repository(url: uri('/Users/wangjie/.m2/repository'))
-            pom.project {
-                artifactId "discardfile-api"
-            }
-        }
-    }
-}
+//apply from: 'nexus_jar_local.gradle'
+apply from: 'nexus_jar_db.gradle'
+//apply from: 'nexus_jar_center.gradle'

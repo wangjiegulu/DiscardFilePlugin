@@ -58,7 +58,7 @@ public class DiscardInject {
                                 println("[DiscardFilePlugin] -> [NOT APPLIED]Discard class : " + className)
                             } else {
                                 discardClass(ctClass, classDiscard);
-                                ctClass.writeFile(dirPath)
+//                                ctClass.writeFile(dirPath)
                                 println("[DiscardFilePlugin] -> [APPLIED]Discard class : " + className)
                             }
                         } else {
@@ -69,7 +69,6 @@ public class DiscardInject {
                             int ctMethodsLength = ctMethods.length;
                             for (int i = 0; i < ctMethodsLength; i++) {
                                 CtMethod ctMethod = ctMethods[i];
-
                                 Discard methodDiscard = ctMethod.getAnnotation(Discard.class)
                                 if (null != methodDiscard) {
                                     if (!isApplyDiscard(project, methodDiscard, "Discard method : " + ctMethod.getLongName())) {
@@ -78,10 +77,13 @@ public class DiscardInject {
                                     }
                                     println("[DiscardFilePlugin] -> [APPLIED]Discard method : " + ctMethod.getLongName())
                                     discardMethod(ctMethod, methodDiscard)
-                                    ctClass.writeFile(dirPath)
+//                                    ctClass.writeFile(dirPath)
                                 }
                             }
+
+
                         }
+                        ctClass.writeFile(dirPath)
                         ctClass.detach()
 
                     }
@@ -95,6 +97,8 @@ public class DiscardInject {
 
     private static void discardClass(CtClass ctClass, @NonNull Discard discard) {
         tryMakeClasses(discard)
+
+        // discard methods
         CtMethod[] ctMethods = ctClass.getDeclaredMethods();
         int ctMethodsLength = ctMethods.length;
         for (int i = 0; i < ctMethodsLength; i++) {
@@ -102,6 +106,7 @@ public class DiscardInject {
             discardMethod(ctMethod, ctMethod.getAnnotation(Discard.class))
         }
     }
+
 
     private static void discardMethod(CtMethod ctMethod, @Nullable Discard discard) {
         String srcCode = null;
@@ -115,11 +120,9 @@ public class DiscardInject {
         }
 
         if (null == srcCode || srcCode.length() < 2) {
-            srcCode = getDefaultSrcCode(ctMethod)
+            srcCode = "{ return " + getDefaultTypeValue(ctMethod.getReturnType()) + "; }"
         }
-
         ctMethod.setBody(srcCode)
-
     }
 
     private static boolean isApplyDiscard(Project project, Discard discard, String tag) {
@@ -147,18 +150,24 @@ public class DiscardInject {
     }
 
     private static boolean isValidateFile(DiscardFile discardFile, String classNamePath) {
-        int excludeLength = discardFile.excludePackagePath.length;
-        for (int i = 0; i < excludeLength; i++) {
-            if (classNamePath.contains(discardFile.excludePackagePath[i].replaceAll("\\.", "/"))) {
-                return false
+        // 优先检查exclude，如果包含在exclude中，则不通过
+        if (null != discardFile.excludePackagePath && discardFile.excludePackagePath.length > 0) {
+            int excludeLength = discardFile.excludePackagePath.length;
+            for (int i = 0; i < excludeLength; i++) {
+                if (classNamePath.contains(discardFile.excludePackagePath[i].replaceAll("\\.", "/"))) {
+                    return false
+                }
             }
         }
 
-        int includeLength = discardFile.includePackagePath.length;
-        if (0 == includeLength) {
+        // 如果没有设置include，则默认包含所有包
+        if (null == discardFile.includePackagePath || discardFile.includePackagePath.length <= 0) {
             return true;
         }
+
+        // 如果明确了include，则检查是否在include中
         boolean isInclude = false;
+        int includeLength = discardFile.includePackagePath.length;
         for (int i = 0; i < includeLength; i++) {
             if (classNamePath.contains(discardFile.includePackagePath[i].replaceAll("\\.", "/"))) {
                 isInclude = true;
@@ -168,28 +177,25 @@ public class DiscardInject {
         return isInclude;
     }
 
-    private static String getDefaultSrcCode(CtMethod ctMethod) {
-        CtClass returnType = ctMethod.getReturnType()
-        if (CtClass.voidType == returnType) {
-            return "{}"
-        } else if (CtClass.booleanType == returnType) {
-            return "{ return false; }"
-        } else if (CtClass.byteType == returnType) {
-            return "{ return 0; }"
-        } else if (CtClass.charType == returnType) {
-            return "{ return 0; }"
-        } else if (CtClass.doubleType == returnType) {
-            return "{ return 0; }"
-        } else if (CtClass.floatType == returnType) {
-            return "{ return 0F; }"
-        } else if (CtClass.intType == returnType) {
-            return "{ return 0; }"
-        } else if (CtClass.longType == returnType) {
-            return "{ return 0L; }"
-        } else if (CtClass.shortType == returnType) {
-            return "{ return 0; }"
+    private static String getDefaultTypeValue(CtClass type) {
+        if (CtClass.booleanType == type) {
+            return "false"
+        } else if (CtClass.byteType == type) {
+            return "0"
+        } else if (CtClass.charType == type) {
+            return "0"
+        } else if (CtClass.doubleType == type) {
+            return "0"
+        } else if (CtClass.floatType == type) {
+            return "0F"
+        } else if (CtClass.intType == type) {
+            return "0"
+        } else if (CtClass.longType == type) {
+            return "0L"
+        } else if (CtClass.shortType == type) {
+            return "0"
         } else {
-            return "{ return null; }"
+            return "null"
         }
     }
 

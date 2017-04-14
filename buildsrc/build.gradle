@@ -6,7 +6,7 @@ dependencies {
     compile localGroovy()
     compile 'com.android.tools.build:gradle:2.2.0'
     compile 'org.javassist:javassist:3.21.0-GA'
-    compile 'com.wangjie.plg:discardfile-api:1.0.0-rc-2-SNAPSHOT'
+    compile 'com.github.wangjiegulu:discardfile-api:1.0.0'
 }
 
 // --refresh-dependencies
@@ -22,20 +22,7 @@ repositories {
     }
 }
 
-//group和version在后面使用自定义插件的时候会用到
-group = 'com.wangjie.plg'
-version = '1.0.0-SNAPSHOT'
-
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            //提交到远程服务器：
-            // repository(url: "http://www.xxx.com/repos") {
-            //    authentication(userName: "admin", password: "admin")
-            // }
-            //本地的Maven地址设置为D:/repos
-            repository(url: uri('/Users/wangjie/.m2/repository'))
-        }
-    }
-}
+//apply from: 'nexus_jar_local.gradle'
+apply from: 'nexus_jar_db.gradle'
+//apply from: 'nexus_jar_center.gradle'
 

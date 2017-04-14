@@ -7,8 +7,9 @@ import com.wangjie.plg.discardfile.api.annotation.Discard;
  * Email: tiantian.china.2@gmail.com
  * Date: 4/13/17.
  */
-@Discard(applyParamValue = "false")
+@Discard(applyParamValue = "true") // apply param => `isRelease = true`
 public class IncludeClassC {
+
     /**
      * 因为IncludeClassC类增加了`@Discard`注解，所以该方法也会被discard。
      */

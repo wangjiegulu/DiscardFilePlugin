@@ -4,11 +4,11 @@ apply plugin: 'com.android.application'
 
 //com.wangjie.myplugin为resources/META-INF/gradle-plugins
 //下的properties文件名称
-//apply plugin: 'com.wangjie.plugin.myplugin'
+//apply plugin: 'com.github.wangjiegulu.plg.discardfile'
 apply plugin: DiscardFilePlugin
 
 discard {
-    includePackagePath 'com.wangjie.plg.discardfile.sample.ui', 'com.wangjie.plg.discardfile.sample.include'
+    includePackagePath 'com.wangjie.plg.discardfile.sample.ui', 'com.wangjie.plg.discardfile.sample.ui.include'
     excludePackagePath 'com.wangjie.plg.discardfile.sample.exclude'/*, 'com.wangjie.plg.discardfile.sample.ui.MainActivity'*/
 }
 
