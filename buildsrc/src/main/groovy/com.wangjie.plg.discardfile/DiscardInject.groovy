@@ -10,17 +10,20 @@ import javassist.CtMethod
 import org.gradle.api.Project
 
 public class DiscardInject {
-    public static ClassPool pool = ClassPool.getDefault();
+    public ClassPool pool/* = ClassPool.getDefault()*/;
 
-    public static void applyInject(Project project, String dirPath) {
+    DiscardInject(ClassPool pool) {
+        this.pool = pool
+    }
+
+    public void applyInject(Project project, String dirPath) {
         pool.appendClassPath(dirPath)
         File dir = new File(dirPath)
         if (!dir.isDirectory()) {
             return
         }
 
-        project.
-                println "[DiscardFilePlugin] inject dirPath: " + dirPath
+        println "[DiscardFilePlugin] inject dirPath: " + dirPath
         System.setProperty(DiscardConstant.APPLY_PARAM_DEFAULT,
                 String.valueOf(
                         dirPath.endsWith("/release")
@@ -101,7 +104,7 @@ public class DiscardInject {
 
     }
 
-    private static void discardClass(CtClass ctClass, @NonNull Discard discard) {
+    private void discardClass(CtClass ctClass, @NonNull Discard discard) {
         tryMakeClasses(discard)
 
         // discard methods
@@ -114,7 +117,7 @@ public class DiscardInject {
     }
 
 
-    private static void discardMethod(CtMethod ctMethod, @Nullable Discard discard) {
+    private void discardMethod(CtMethod ctMethod, @Nullable Discard discard) {
         String srcCode = null;
         if (null != discard) {
             // Cancel this discard if it is disabled.
@@ -131,7 +134,7 @@ public class DiscardInject {
         ctMethod.setBody(srcCode)
     }
 
-    private static boolean isApplyDiscard(Project project, Discard discard, String tag) {
+    private boolean isApplyDiscard(Project project, Discard discard, String tag) {
         String applyParam = discard.applyParam()
         String applyParamExpectValue = discard.applyParamValue()
         String applyParamValue = getParameter(project, applyParam);
@@ -143,7 +146,7 @@ public class DiscardInject {
         return true;
     }
 
-    private static void tryMakeClasses(Discard discard) {
+    private void tryMakeClasses(Discard discard) {
         String[] paramMakeClassNames = discard.makeClassNames();
         if (null != paramMakeClassNames) {
             int paramMakeClassLen = paramMakeClassNames.length;
@@ -155,7 +158,7 @@ public class DiscardInject {
         }
     }
 
-    private static boolean isValidateFile(DiscardFile discardFile, String classNamePath) {
+    private boolean isValidateFile(DiscardFileExtension discardFile, String classNamePath) {
         // 优先检查exclude，如果包含在exclude中，则不通过
         if (null != discardFile.excludePackagePath && discardFile.excludePackagePath.length > 0) {
             int excludeLength = discardFile.excludePackagePath.length;
@@ -183,7 +186,7 @@ public class DiscardInject {
         return isInclude;
     }
 
-    private static String getDefaultTypeValue(CtClass type) {
+    private String getDefaultTypeValue(CtClass type) {
         if (CtClass.booleanType == type) {
             return "false"
         } else if (CtClass.byteType == type) {
@@ -205,7 +208,7 @@ public class DiscardInject {
         }
     }
 
-    private static String getParameter(Project project, String key) {
+    private String getParameter(Project project, String key) {
         // -D
         String value = System.getProperty(key)
         if (null != value && value.length() > 0) {
@@ -217,5 +220,10 @@ public class DiscardInject {
         }
         return null
     }
+
+    public void clear(){
+        pool = null
+    }
+
 
 }

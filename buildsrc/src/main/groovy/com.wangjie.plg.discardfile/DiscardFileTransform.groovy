@@ -3,14 +3,19 @@ package com.wangjie.plg.discardfile
 import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
 import com.android.utils.FileUtils
+import javassist.ClassPool
 import org.apache.commons.codec.digest.DigestUtils
 import org.gradle.api.Project
 
 public class DiscardFileTransform extends Transform {
     Project project;
+    ClassPool pool;
+    DiscardInject discardInject;
 
-    DiscardFileTransform(Project project) {
+    DiscardFileTransform(Project project, ClassPool classPool) {
         this.project = project
+        this.pool = classPool;
+        this.discardInject = new DiscardInject(pool)
     }
 
     // 设置我们自定义的Transform对应的Task名称
@@ -39,7 +44,7 @@ public class DiscardFileTransform extends Transform {
 
     @Override
     boolean isIncremental() {
-        return false
+        return true
     }
 
     @Override
@@ -75,7 +80,7 @@ public class DiscardFileTransform extends Transform {
                 //将输入内容复制到输出
                 FileUtils.copyFile(jarInput.file, dest)
 
-                DiscardInject.pool.appendClassPath(jarInput.file.getAbsolutePath())
+                pool.appendClassPath(jarInput.file.getAbsolutePath())
             }
 
             // 对类型为“文件夹”的input进行遍历
@@ -83,8 +88,6 @@ public class DiscardFileTransform extends Transform {
                 // 文件夹里面包含的是我们手写的类以及R.class、BuildConfig.class以及R$XXX.class等
 
 //                println(">>>>>>>>>>>>>>>> dir name: " + directoryInput.file)
-                // 进行class注入
-                DiscardInject.applyInject(project, directoryInput.file.getAbsolutePath())
 
                 // 获取output目录
                 def dest = transformInvocation.outputProvider.getContentLocation(
@@ -95,11 +98,15 @@ public class DiscardFileTransform extends Transform {
 
                 // 将input的目录复制到output指定目录
                 FileUtils.copyDirectory(directoryInput.file, dest)
+
+                // 进行class注入
+                discardInject.applyInject(project, dest.getAbsolutePath())
+
             }
 
-
         }
-
+        discardInject.clear();
+        discardInject = null;
         println("[DiscardFilePlugin] -> Discard file transform takes: " + (System.currentTimeMillis() - start) + "ms")
         println("+-----------------------------------------------------------------------------+");
         println("|                       Discard File Transform END                            |");

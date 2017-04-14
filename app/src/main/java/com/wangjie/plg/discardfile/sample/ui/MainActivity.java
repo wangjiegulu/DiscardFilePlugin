@@ -12,8 +12,12 @@ public class MainActivity extends AppCompatActivity {
     private EditText usernameEt;
     private EditText passwordEt;
 
+    /**
+     * method body params:
+     * http://jboss-javassist.github.io/javassist/tutorial/tutorial2.html#alter
+     */
     @Override
-//    @Discard
+    @Discard(srcCode = "{super.onCreate($1); System.out.println(\"this: \" + $0);}")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -22,8 +26,8 @@ public class MainActivity extends AppCompatActivity {
         setTestAccount();
     }
 
-    @Discard
-    private void setTestAccount(){
+    @Discard(srcCode = "{System.out.println(\"hello world isIncremental = true\");}")
+    private void setTestAccount() {
         usernameEt.setText("wangjie");
         passwordEt.setText("111111");
     }
