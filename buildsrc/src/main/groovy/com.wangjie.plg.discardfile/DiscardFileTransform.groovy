@@ -43,6 +43,7 @@ public class DiscardFileTransform extends Transform {
     Set<QualifiedContent.Scope> getScopes() {
         if (isLibrary) {
             return TransformManager.SCOPE_FULL_LIBRARY
+//            return Sets.immutableEnumSet(QualifiedContent.Scope.PROJECT, QualifiedContent.Scope.PROJECT_LOCAL_DEPS, QualifiedContent.Scope.EXTERNAL_LIBRARIES)
         }
         return TransformManager.SCOPE_FULL_PROJECT
     }
