@@ -103,7 +103,7 @@ discard之后的class反编译代码如下：
 
 ```groovy
 // 使用插件
-apply plugin: 'com.wangjie.plg.discardfile'
+apply plugin: 'com.github.wangjiegulu.plg.discardfile'
 
 // 配置需要修改的类所属在那些包下
 discard {
