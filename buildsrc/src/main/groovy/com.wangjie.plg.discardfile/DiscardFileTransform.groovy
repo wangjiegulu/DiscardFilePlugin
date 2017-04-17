@@ -3,7 +3,6 @@ package com.wangjie.plg.discardfile
 import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
 import com.android.utils.FileUtils
-import com.wangjie.plg.discardfile.api.constant.DiscardConstant
 import javassist.ClassPool
 import org.apache.commons.codec.digest.DigestUtils
 import org.gradle.api.Project
@@ -12,14 +11,12 @@ public class DiscardFileTransform extends Transform {
     Project project;
     ClassPool pool;
     boolean isLibrary;
-    DiscardInject discardInject;
 
     DiscardFileTransform(Project project, ClassPool classPool, isLibrary) {
         this.project = project
         this.pool = classPool;
         this.isLibrary = isLibrary;
         println("isLibrary: " + isLibrary)
-        this.discardInject = new DiscardInject(pool)
 
 
     }
@@ -49,7 +46,7 @@ public class DiscardFileTransform extends Transform {
 
     @Override
     boolean isIncremental() {
-        return true
+        return false
     }
 
     @Override
@@ -89,6 +86,7 @@ public class DiscardFileTransform extends Transform {
             }
 
             // 对类型为“文件夹”的input进行遍历
+            DiscardInject discardInject = new DiscardInject(pool)
             input.directoryInputs.each { DirectoryInput directoryInput ->
                 // 文件夹里面包含的是我们手写的类以及R.class、BuildConfig.class以及R$XXX.class等
 
@@ -108,10 +106,11 @@ public class DiscardFileTransform extends Transform {
                 discardInject.applyInject(project, dest.getAbsolutePath())
 
             }
+            discardInject.clear();
+            discardInject = null;
 
         }
-        discardInject.clear();
-        discardInject = null;
+
         println("[DiscardFilePlugin] -> Discard file transform takes: " + (System.currentTimeMillis() - start) + "ms")
         println("+-----------------------------------------------------------------------------+");
         println("|                       Discard File Transform END                            |");
