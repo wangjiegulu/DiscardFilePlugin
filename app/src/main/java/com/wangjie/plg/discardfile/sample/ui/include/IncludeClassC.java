@@ -8,7 +8,7 @@ import com.wangjie.plg.discardfile.sample.constants.ApplyConstants;
  * Email: tiantian.china.2@gmail.com
  * Date: 4/13/17.
  */
-@Discard(apply = ApplyConstants.Publish._TRUE) // apply param => `isRelease = true`
+@Discard(apply = ApplyConstants.Publish._TRUE)
 public class IncludeClassC {
 
     /**
