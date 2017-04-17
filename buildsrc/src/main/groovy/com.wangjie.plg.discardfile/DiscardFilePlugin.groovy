@@ -1,13 +1,13 @@
 package com.wangjie.plg.discardfile
 
-import com.android.build.gradle.AppExtension
-//import com.android.build.gradle.AppPlugin
-//import com.android.build.gradle.LibraryPlugin
+import com.android.build.gradle.*
 import com.wangjie.plg.discardfile.api.constant.DiscardConstant
 import javassist.ClassPool
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
+//import com.android.build.gradle.AppPlugin
+//import com.android.build.gradle.LibraryPlugin
 public class DiscardFilePlugin implements Plugin<Project> {
 
     @Override
@@ -34,8 +34,14 @@ public class DiscardFilePlugin implements Plugin<Project> {
 
         project.extensions.create(DiscardConstant.EXTENSION_NAME, DiscardFileExtension);
         DiscardFileTransform discardFileTransform = new DiscardFileTransform(project, classPool);
-        project.extensions.getByType(AppExtension).registerTransform(discardFileTransform)
 
+        if (project.plugins.hasPlugin(LibraryPlugin)) {
+            project.extensions.getByType(LibraryExtension).registerTransform(discardFileTransform)
+        } else if (project.plugins.hasPlugin(TestPlugin)) {
+            project.extensions.getByType(TestExtension).registerTransform(discardFileTransform)
+        } else {
+            project.extensions.getByType(AppExtension).registerTransform(discardFileTransform)
+        }
 
         project.afterEvaluate {
 
@@ -43,11 +49,11 @@ public class DiscardFilePlugin implements Plugin<Project> {
             println("[DiscardFilePlugin] -> bootClasspath: " + bootClasspath + ", this: " + this)
             classPool.appendClassPath(bootClasspath)
 //            variants.all { variant ->
-                /*
-                 * variant.name: panelRelease
-                 * variant.baseName: panel-release
-                 * variant.dirName: panel/release
-                 */
+            /*
+             * variant.name: panelRelease
+             * variant.baseName: panel-release
+             * variant.dirName: panel/release
+             */
 
 //            }
         }
