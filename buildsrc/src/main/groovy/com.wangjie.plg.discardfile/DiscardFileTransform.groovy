@@ -10,11 +10,13 @@ import org.gradle.api.Project
 public class DiscardFileTransform extends Transform {
     Project project;
     ClassPool pool;
+    boolean isLibrary;
     DiscardInject discardInject;
 
-    DiscardFileTransform(Project project, ClassPool classPool) {
+    DiscardFileTransform(Project project, ClassPool classPool, isLibrary) {
         this.project = project
         this.pool = classPool;
+        this.isLibrary = isLibrary;
         this.discardInject = new DiscardInject(pool)
     }
 
@@ -33,13 +35,16 @@ public class DiscardFileTransform extends Transform {
 //        contentTypes.add(TransformManager.CONTENT_CLASS)
 //        contentTypes.add(TransformManager.CONTENT_RESOURCES)
 //        return contentTypes;
-        return TransformManager.CONTENT_CLASS;
+        return TransformManager.CONTENT_CLASS
     }
 
     // 指定Transform的作用范围
     @Override
     Set<QualifiedContent.Scope> getScopes() {
-        return TransformManager.SCOPE_FULL_PROJECT;
+        if (isLibrary) {
+            return TransformManager.SCOPE_FULL_LIBRARY
+        }
+        return TransformManager.SCOPE_FULL_PROJECT
     }
 
     @Override

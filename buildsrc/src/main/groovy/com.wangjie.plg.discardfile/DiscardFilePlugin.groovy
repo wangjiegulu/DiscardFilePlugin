@@ -31,11 +31,12 @@ public class DiscardFilePlugin implements Plugin<Project> {
 
         ClassPool classPool = new ClassPool(null);
         classPool.appendSystemPath();
+        boolean isLibrary = project.plugins.hasPlugin(LibraryPlugin);
 
         project.extensions.create(DiscardConstant.EXTENSION_NAME, DiscardFileExtension);
-        DiscardFileTransform discardFileTransform = new DiscardFileTransform(project, classPool);
+        DiscardFileTransform discardFileTransform = new DiscardFileTransform(project, classPool, isLibrary);
 
-        if (project.plugins.hasPlugin(LibraryPlugin)) {
+        if (isLibrary) {
             project.extensions.getByType(LibraryExtension).registerTransform(discardFileTransform)
         } else if (project.plugins.hasPlugin(TestPlugin)) {
             project.extensions.getByType(TestExtension).registerTransform(discardFileTransform)
