@@ -12,12 +12,17 @@ public class DiscardFileTransform extends Transform {
     ClassPool pool;
     boolean isLibrary;
     DiscardInject discardInject;
+    DiscardFileExtension discardFileExtension;
 
     DiscardFileTransform(Project project, ClassPool classPool, isLibrary) {
         this.project = project
         this.pool = classPool;
         this.isLibrary = isLibrary;
+        println("isLibrary: " + isLibrary)
         this.discardInject = new DiscardInject(pool)
+
+        discardFileExtension = project['discard']
+        println "[DiscardFilePlugin] -> Configuration -> incremental: " + discardFileExtension.incremental + ", includePackagePath: " + discardFileExtension.includePackagePath + ", excludePackagePath: " + discardFileExtension.excludePackagePath
     }
 
     // 设置我们自定义的Transform对应的Task名称
@@ -31,10 +36,6 @@ public class DiscardFileTransform extends Transform {
     // 这样确保其他类型的文件不会传入
     @Override
     Set<QualifiedContent.ContentType> getInputTypes() {
-//        HashSet<QualifiedContent.ContentType> contentTypes = new HashSet<>();
-//        contentTypes.add(TransformManager.CONTENT_CLASS)
-//        contentTypes.add(TransformManager.CONTENT_RESOURCES)
-//        return contentTypes;
         return TransformManager.CONTENT_CLASS
     }
 
@@ -43,14 +44,13 @@ public class DiscardFileTransform extends Transform {
     Set<QualifiedContent.Scope> getScopes() {
         if (isLibrary) {
             return TransformManager.SCOPE_FULL_LIBRARY
-//            return Sets.immutableEnumSet(QualifiedContent.Scope.PROJECT, QualifiedContent.Scope.PROJECT_LOCAL_DEPS, QualifiedContent.Scope.EXTERNAL_LIBRARIES)
         }
         return TransformManager.SCOPE_FULL_PROJECT
     }
 
     @Override
     boolean isIncremental() {
-        return true
+        return discardFileExtension.incremental
     }
 
     @Override
@@ -106,7 +106,7 @@ public class DiscardFileTransform extends Transform {
                 FileUtils.copyDirectory(directoryInput.file, dest)
 
                 // 进行class注入
-                discardInject.applyInject(project, dest.getAbsolutePath())
+                discardInject.applyInject(project, discardFileExtension, dest.getAbsolutePath())
 
             }
 

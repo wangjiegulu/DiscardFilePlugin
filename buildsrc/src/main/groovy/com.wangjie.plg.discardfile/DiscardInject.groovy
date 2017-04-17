@@ -16,7 +16,7 @@ public class DiscardInject {
         this.pool = pool
     }
 
-    public void applyInject(Project project, String dirPath) {
+    public void applyInject(Project project, DiscardFileExtension discardFileExtension, String dirPath) {
         pool.appendClassPath(dirPath)
         File dir = new File(dirPath)
         if (!dir.isDirectory()) {
@@ -32,9 +32,6 @@ public class DiscardInject {
                 )
         )
 
-        def discardFile = project['discard']
-        println "[DiscardFilePlugin] -> Configuration: " + discardFile.includePackagePath + ", " + discardFile.excludePackagePath
-
         dir.eachFileRecurse { File file ->
             String filePath = file.absolutePath
             if (filePath.endsWith(".class")
@@ -48,7 +45,7 @@ public class DiscardInject {
                         classNamePath = classNamePath.substring(1)
                     }
 //                    println "classNamePath: " + classNamePath
-                    if (isValidateFile(discardFile, classNamePath)) {
+                    if (isValidateFile(discardFileExtension, classNamePath)) {
                         String className = classNamePath.replaceAll("/", ".")
                         if (className.endsWith(".class")) {
                             className = className.substring(0, className.length() - 6)
@@ -221,7 +218,7 @@ public class DiscardInject {
         return null
     }
 
-    public void clear(){
+    public void clear() {
         pool = null
     }
 

@@ -8,8 +8,10 @@ apply plugin: 'com.android.application'
 apply plugin: DiscardFilePlugin
 
 discard {
+    incremental false
     includePackagePath 'com.wangjie.plg.discardfile.sample.ui', 'com.wangjie.plg.discardfile.sample.ui.include'
-    excludePackagePath 'com.wangjie.plg.discardfile.sample.exclude'/*, 'com.wangjie.plg.discardfile.sample.ui.MainActivity'*/
+    excludePackagePath 'com.wangjie.plg.discardfile.sample.exclude'
+/*, 'com.wangjie.plg.discardfile.sample.ui.MainActivity'*/
 }
 
 android {
@@ -68,5 +70,11 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     testCompile 'junit:junit:4.12'
 
+    compile project(':depmodule')
+
+//    releaseCompile project(path: ':depmodule', configuration: 'release')
+//    debugCompile project(path: ':depmodule', configuration: 'debug')
+
     compile project(':discardfile-api')
+
 }

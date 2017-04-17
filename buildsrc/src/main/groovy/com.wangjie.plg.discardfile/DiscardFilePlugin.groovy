@@ -1,7 +1,10 @@
 package com.wangjie.plg.discardfile
 
 import com.android.build.gradle.*
+import com.wangjie.plg.discardfile.api.annotation.Discard
 import com.wangjie.plg.discardfile.api.constant.DiscardConstant
+import javassist.ClassClassPath
+import javassist.ClassPath
 import javassist.ClassPool
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -36,6 +39,9 @@ public class DiscardFilePlugin implements Plugin<Project> {
         project.extensions.create(DiscardConstant.EXTENSION_NAME, DiscardFileExtension);
         DiscardFileTransform discardFileTransform = new DiscardFileTransform(project, classPool, isLibrary);
 
+        // hotfix: cannot find Discard file...
+        classPool.insertClassPath(new ClassClassPath(Discard.class))
+
         if (isLibrary) {
             project.extensions.getByType(LibraryExtension).registerTransform(discardFileTransform)
         } else if (project.plugins.hasPlugin(TestPlugin)) {
@@ -43,7 +49,6 @@ public class DiscardFilePlugin implements Plugin<Project> {
         } else {
             project.extensions.getByType(AppExtension).registerTransform(discardFileTransform)
         }
-
         project.afterEvaluate {
 
             def bootClasspath = project.android.bootClasspath.join(File.pathSeparator)

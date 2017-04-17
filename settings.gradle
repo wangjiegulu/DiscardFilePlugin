@@ -1,1 +1,1 @@
-include ':app', ':buildsrc', ':discardfile-api'
+include ':app', ':buildsrc', ':discardfile-api', ':depmodule'
