@@ -7,8 +7,6 @@ package com.wangjie.plg.discardfile.api.constant;
  */
 public class DiscardConstant {
     public static final String EXTENSION_NAME = "discard";
-    public static final String APPLY_PARAM_DEFAULT = "isRelease";
-    public static final String APPLY_PARAM_VALUE_DEFAULT = "true";
     public static final String SRC_CODE_DEFAULT = "";
 
 }

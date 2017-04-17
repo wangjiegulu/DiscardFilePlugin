@@ -8,7 +8,6 @@ apply plugin: 'com.android.application'
 apply plugin: DiscardFilePlugin
 
 discard {
-    incremental false
     includePackagePath 'com.wangjie.plg.discardfile.sample.ui', 'com.wangjie.plg.discardfile.sample.ui.include'
     excludePackagePath 'com.wangjie.plg.discardfile.sample.exclude'
 /*, 'com.wangjie.plg.discardfile.sample.ui.MainActivity'*/

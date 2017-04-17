@@ -6,6 +6,7 @@ import android.widget.EditText;
 
 import com.wangjie.plg.discardfile.api.annotation.Discard;
 import com.wangjie.plg.discardfile.sample.R;
+import com.wangjie.plg.discardfile.sample.constants.ApplyConstants;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -17,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
      * http://jboss-javassist.github.io/javassist/tutorial/tutorial2.html#alter
      */
     @Override
-    @Discard(srcCode = "{super.onCreate($1); System.out.println(\"this: \" + $0);}")
+    @Discard(apply = ApplyConstants.Publish._TRUE, srcCode = "{super.onCreate($1); System.out.println(\"this: \" + $0);}")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -26,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         setTestAccount();
     }
 
-    @Discard(srcCode = "{System.out.println(\"hello world isIncremental = true\");}")
+    @Discard(apply = ApplyConstants.Publish._TRUE, srcCode = "{System.out.println(\"hello world isIncremental = true\");}")
     private void setTestAccount() {
         usernameEt.setText("wangjie");
         passwordEt.setText("111111");

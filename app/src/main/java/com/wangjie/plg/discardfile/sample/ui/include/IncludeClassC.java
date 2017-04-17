@@ -1,13 +1,14 @@
 package com.wangjie.plg.discardfile.sample.ui.include;
 
 import com.wangjie.plg.discardfile.api.annotation.Discard;
+import com.wangjie.plg.discardfile.sample.constants.ApplyConstants;
 
 /**
  * Author: wangjie
  * Email: tiantian.china.2@gmail.com
  * Date: 4/13/17.
  */
-@Discard(applyParamValue = "true") // apply param => `isRelease = true`
+@Discard(apply = ApplyConstants.Publish._TRUE) // apply param => `isRelease = true`
 public class IncludeClassC {
 
     /**
@@ -20,7 +21,7 @@ public class IncludeClassC {
     /**
      * 替换该方法的实现为：{System.out.println("onIncludeMethodC_2... injected!");}
      */
-    @Discard(srcCode = "{System.out.println(\"onIncludeMethodC_2... injected!\");}")
+    @Discard(apply = ApplyConstants.Publish._TRUE, srcCode = "{System.out.println(\"onIncludeMethodC_2... injected!\");}")
     public void onIncludeMethodC_2() {
         System.out.println("onIncludeMethodC_2...");
     }
@@ -28,7 +29,7 @@ public class IncludeClassC {
     /**
      * 替换该方法永远返回true
      */
-    @Discard(srcCode = "{return true;}")
+    @Discard(apply = ApplyConstants.Publish._TRUE, srcCode = "{return true;}")
     public boolean onIncludeMethodC_3() {
         System.out.println("onIncludeMethodC_3...");
         return false;
@@ -45,7 +46,7 @@ public class IncludeClassC {
     /**
      * 由于使用了`@Discard`注解进行显式地声明禁用了本地的discard，所以该方法不会被discard
      */
-    @Discard(enable = false)
+    @Discard(apply = ApplyConstants.Publish._TRUE, enable = false)
     public String onIncludeMethodC_5() {
         System.out.println("onIncludeMethodC_5...");
         return "hello world";
@@ -54,7 +55,7 @@ public class IncludeClassC {
     /**
      * 替换该方法永远返回"hello world"字符串
      */
-    @Discard(srcCode = "{return \"hello world injected!\";}")
+    @Discard(apply = ApplyConstants.Publish._TRUE, srcCode = "{return \"hello world injected!\";}")
     public String onIncludeMethodC_6() {
         System.out.println("onIncludeMethodC_6...");
         return "hello world";

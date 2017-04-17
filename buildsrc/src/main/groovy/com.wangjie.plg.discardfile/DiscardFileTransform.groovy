@@ -3,6 +3,7 @@ package com.wangjie.plg.discardfile
 import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
 import com.android.utils.FileUtils
+import com.wangjie.plg.discardfile.api.constant.DiscardConstant
 import javassist.ClassPool
 import org.apache.commons.codec.digest.DigestUtils
 import org.gradle.api.Project
@@ -12,7 +13,6 @@ public class DiscardFileTransform extends Transform {
     ClassPool pool;
     boolean isLibrary;
     DiscardInject discardInject;
-    DiscardFileExtension discardFileExtension;
 
     DiscardFileTransform(Project project, ClassPool classPool, isLibrary) {
         this.project = project
@@ -21,8 +21,7 @@ public class DiscardFileTransform extends Transform {
         println("isLibrary: " + isLibrary)
         this.discardInject = new DiscardInject(pool)
 
-        discardFileExtension = project['discard']
-        println "[DiscardFilePlugin] -> Configuration -> incremental: " + discardFileExtension.incremental + ", includePackagePath: " + discardFileExtension.includePackagePath + ", excludePackagePath: " + discardFileExtension.excludePackagePath
+
     }
 
     // 设置我们自定义的Transform对应的Task名称
@@ -50,7 +49,7 @@ public class DiscardFileTransform extends Transform {
 
     @Override
     boolean isIncremental() {
-        return discardFileExtension.incremental
+        return true
     }
 
     @Override
@@ -106,7 +105,7 @@ public class DiscardFileTransform extends Transform {
                 FileUtils.copyDirectory(directoryInput.file, dest)
 
                 // 进行class注入
-                discardInject.applyInject(project, discardFileExtension, dest.getAbsolutePath())
+                discardInject.applyInject(project, dest.getAbsolutePath())
 
             }
 

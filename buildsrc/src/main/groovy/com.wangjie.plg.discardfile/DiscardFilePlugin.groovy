@@ -37,6 +37,7 @@ public class DiscardFilePlugin implements Plugin<Project> {
         boolean isLibrary = project.plugins.hasPlugin(LibraryPlugin);
 
         project.extensions.create(DiscardConstant.EXTENSION_NAME, DiscardFileExtension);
+
         DiscardFileTransform discardFileTransform = new DiscardFileTransform(project, classPool, isLibrary);
 
         // hotfix: cannot find Discard file...

@@ -16,21 +16,24 @@ public class DiscardInject {
         this.pool = pool
     }
 
-    public void applyInject(Project project, DiscardFileExtension discardFileExtension, String dirPath) {
+    public void applyInject(Project project, String dirPath) {
         pool.appendClassPath(dirPath)
         File dir = new File(dirPath)
         if (!dir.isDirectory()) {
             return
         }
 
+        def discardFileExtension = project[DiscardConstant.EXTENSION_NAME]
+        println "[DiscardFilePlugin] -> Configuration -> includePackagePath: " + discardFileExtension.includePackagePath + ", excludePackagePath: " + discardFileExtension.excludePackagePath
+
         println "[DiscardFilePlugin] inject dirPath: " + dirPath
-        System.setProperty(DiscardConstant.APPLY_PARAM_DEFAULT,
-                String.valueOf(
-                        dirPath.endsWith("/release")
-                                ||
-                                dirPath.contains("/release/")
-                )
-        )
+//        System.setProperty(DiscardConstant.APPLY_PARAM_DEFAULT,
+//                String.valueOf(
+//                        dirPath.endsWith("/release")
+//                                ||
+//                                dirPath.contains("/release/")
+//                )
+//        )
 
         dir.eachFileRecurse { File file ->
             String filePath = file.absolutePath
@@ -132,12 +135,16 @@ public class DiscardInject {
     }
 
     private boolean isApplyDiscard(Project project, Discard discard, String tag) {
-        String applyParam = discard.applyParam()
-        String applyParamExpectValue = discard.applyParamValue()
-        String applyParamValue = getParameter(project, applyParam);
+        String apply = discard.apply()
+        String[] applyParsed;
+        if (!apply.contains("==") || 2 != ((applyParsed = apply.split("==")).length)) {
+            throw new RuntimeException("apply expression invalidate! -> 'key==exceptValue'")
+        }
+        String applyParamValue = getParameter(project, applyParsed[0].trim());
+        String applyParamExpectValue = applyParsed[1].trim()
 
         if (null == applyParamValue || applyParamExpectValue != applyParamValue) {
-            println("[DiscardFilePlugin] -> [NOT APPLIED PARAM]" + tag + ", applyParam: " + applyParam + ", applyParamExpectValue: " + applyParamExpectValue + ", applyParamValue: " + applyParamValue)
+            println("[DiscardFilePlugin] -> [NOT APPLIED PARAM]" + tag + ", applyParam: " + apply + ", applyParamExpectValue: " + applyParamExpectValue + ", applyParamValue: " + applyParamValue)
             return false;
         }
         return true;
@@ -222,5 +229,12 @@ public class DiscardInject {
         pool = null
     }
 
+    private boolean isEmpty(String string) {
+        return null == string || string.length() <= 0
+    }
+
+    private boolean isBlank(String string) {
+        return null == string || string.trim().length() <= 0
+    }
 
 }

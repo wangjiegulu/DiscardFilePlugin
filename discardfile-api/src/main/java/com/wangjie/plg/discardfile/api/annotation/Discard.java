@@ -11,14 +11,9 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.TYPE})
 public @interface Discard {
     /**
-     * 是否启用Discard的条件参数，默认是"isRelease"
+     * 是否启用Discard的条件参数，格式：key==exceptValue
      */
-    String applyParam() default DiscardConstant.APPLY_PARAM_DEFAULT;
-
-    /**
-     * 是否启用Discard的条件参数值，默认是true（默认参数键值对是"isRelease=true"）
-     */
-    String applyParamValue() default DiscardConstant.APPLY_PARAM_VALUE_DEFAULT;
+    String apply();
 
     /**
      * Method body for replace.
