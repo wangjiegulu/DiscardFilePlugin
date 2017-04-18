@@ -6,7 +6,7 @@ An android gradle plugin for discard classes or methods in compile time.
 
 ## 1.1 Scenes can be used
 
-In the actual product, we always add some debug tools to our app in `debug` model, such as `DebugPanelActivity`(Debug panel tools page, provide some features like "switch server"). And we need to discard and clear related classes and methods in production environment mode, or modify `boolean isProductionEnvironment()` method to let it always return `ture`.
+In the actual product, we always add some debug tools to our app in `debug` model, such as `DebugPanelActivity`(Debug panel tools page, provide some features like "switch server"). And we need to discard and clear related classes and methods in production environment mode, or modify `boolean isProductionEnvironment()` method to let it always return `ture`. **In order to avoid exposing debugging codes in production app via decompile and other trick.**
 
 ## 1.2 `@Discard` annotation
 
