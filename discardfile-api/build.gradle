@@ -14,5 +14,5 @@ configurations.all {
 }
 
 //apply from: 'nexus_jar_local.gradle'
-apply from: 'nexus_jar_db.gradle'
-//apply from: 'nexus_jar_center.gradle'
+//apply from: 'nexus_jar_db.gradle'
+apply from: 'nexus_jar_center.gradle'
