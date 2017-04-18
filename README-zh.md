@@ -6,7 +6,7 @@ An android gradle plugin for discard class or method in compile time.
 
 ## 1.1 使用场景
 
-在`debug`模式下加入`DebugPanelActivity`（调试面板工具页面，提供比如“切换服务器”等操作）。我们需要在正式上线的release版本中清空相关类和方法，或者修改`boolean isProductionEnvironment()`方法，让它永远返回`true`.
+在实际的生产中，我们总是会在我们的app中增加一些调试的工具，比如在`debug`模式下加入`DebugPanelActivity`（调试面板工具页面，提供比如“切换服务器”等操作）。我们需要在正式上线的release版本中清空相关类和方法，或者修改`boolean isProductionEnvironment()`方法，让它永远返回`true`.
 
 ## 1.2 `@Discard`注解
 
@@ -296,7 +296,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing blacklist and
 limitations under the License.
 ```
-
 
 
 
