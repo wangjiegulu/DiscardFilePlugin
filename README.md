@@ -95,13 +95,40 @@ discard之后的class反编译代码如下：
 
 ## 1.3 使用方式
 
-> 源码依赖，目前不支持远程依赖，稍后更新远程依赖的支持
+
+### Gradle([Check newest version](http://search.maven.org/#search%7Cga%7C1%7Cdiscardfile)):
+
+`build.gradle` in Project:
+
+```groovy
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.2.2'
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+        classpath 'com.github.wangjiegulu:discardfile:x.x.x'
+    }
+}
+```
+
+`build.gradle` in `app` or `library`:
+
+```groovy
+apply plugin: 'com.github.wangjiegulu.plg.discardfile'
+
+dependencies {
+	compile 'com.github.wangjiegulu:discardfile-api:x.x.x'
+}
+```
 
 ### 1.3.1. 修改`build.gradle`
 
 ```groovy
 // 使用插件
-apply plugin: 'com.wangjie.plg.discardfile'
+apply plugin: 'com.github.wangjiegulu.plg.discardfile'
 
 // 配置需要修改的类所属在那些包下
 discard {
@@ -269,6 +296,5 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing blacklist and
 limitations under the License.
 ```
-
 
 
