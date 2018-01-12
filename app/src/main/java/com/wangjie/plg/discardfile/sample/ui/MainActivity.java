@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         setTestAccount();
     }
 
-    @Discard(apply = ApplyConstants.Publish._TRUE, srcCode = "{System.out.println(\"hello world isIncremental = true\");}")
+    @Discard(apply = ApplyConstants.Publish._TRUE, srcCode = "{System.out.println(\"hello world injected!\");}")
     private void setTestAccount() {
         usernameEt.setText("wangjie");
         passwordEt.setText("111111");

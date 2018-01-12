@@ -43,6 +43,7 @@ public class DiscardInject {
                     && !filePath.contains("BuildConfig.class")
             ) {
                 String classNamePath = filePath.replace(dirPath, "")
+
                 if (null != classNamePath && classNamePath.length() > 0) {
                     if (classNamePath.startsWith("/")) {
                         classNamePath = classNamePath.substring(1)
