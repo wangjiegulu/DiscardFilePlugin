@@ -3,6 +3,7 @@ package com.wangjie.plg.discardfile
 import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
 import com.android.utils.FileUtils
+import com.google.common.collect.Sets
 import javassist.ClassPool
 import org.apache.commons.codec.digest.DigestUtils
 import org.gradle.api.Project
@@ -39,7 +40,9 @@ public class DiscardFileTransform extends Transform {
     @Override
     Set<QualifiedContent.Scope> getScopes() {
         if (isLibrary) {
-            return TransformManager.SCOPE_FULL_LIBRARY
+//            return TransformManager.SCOPE_FULL_LIBRARY_WITH_LOCAL_JARS
+            return Sets.immutableEnumSet(
+                    QualifiedContent.Scope.PROJECT)
         }
         return TransformManager.SCOPE_FULL_PROJECT
     }

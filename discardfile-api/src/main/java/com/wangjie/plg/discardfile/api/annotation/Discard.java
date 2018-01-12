@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.TYPE})
 public @interface Discard {
     /**
-     * 是否启用Discard的条件参数，格式：key==exceptValue
+     * Discard apply conditions eg. key==exceptValue
      */
     String apply();
 

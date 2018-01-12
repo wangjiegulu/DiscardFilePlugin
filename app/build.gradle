@@ -15,7 +15,7 @@ discard {
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.0"
+    buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "com.wangjie.plg.discardfile.sample"
         minSdkVersion 14
@@ -43,10 +43,14 @@ android {
         }
     }
 
+    flavorDimensions "panel", "full"
+
     productFlavors {
         panel {
+            dimension "panel"
         }
         full {
+            dimension "full"
         }
     }
 
