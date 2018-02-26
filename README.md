@@ -92,7 +92,7 @@ Special class names here, it will make classes that not in the class path when d
 
 It represents that if discard for this class or method is enabled state, default is `true`, A typical scene is, add a `@Discard` in class to discard all methods in this class, but need a method does not. You can then use `@Discard (enable = false)` to exclude the method from the `discard` scope.
 
-## 1.3 使用方式
+## 1.3 How to use
 
 ### Gradle([Check newest version](http://search.maven.org/#search%7Cga%7C1%7Cdiscardfile)):
 
