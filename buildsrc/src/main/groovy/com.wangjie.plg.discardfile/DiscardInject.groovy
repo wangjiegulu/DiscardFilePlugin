@@ -45,40 +45,39 @@ public class DiscardInject {
                 String classNamePath = filePath.replace(dirPath, "")
 
                 if (null != classNamePath && classNamePath.length() > 0) {
-                    if (classNamePath.startsWith("/")) {
+                    if (classNamePath.startsWith("$File.separatorChar")) {
                         classNamePath = classNamePath.substring(1)
                     }
-//                    println "classNamePath: " + classNamePath
+//                    println "--------- classNamePath: " + classNamePath
                     if (isValidateFile(discardFileExtension, classNamePath)) {
-                        String className = classNamePath.replaceAll("/", ".")
+                        String className = classNamePath.replaceAll("$File.separatorChar", ".")
                         if (className.endsWith(".class")) {
                             className = className.substring(0, className.length() - 6)
+//                            println "------ className: $className"
                         }
                         CtClass ctClass = pool.get(className)
-                        if (ctClass.isFrozen()) {
-                            ctClass.defrost()
-                        }
+                        checkDefrost(ctClass)
 
                         /*
                          * If Add @Discard annotation at Class, discard all declared methods
                          */
-                        Discard classDiscard = ctClass.getAnnotation(Discard.class);
+                        Discard classDiscard = ctClass.getAnnotation(Discard.class)
                         if (null != classDiscard) {
                             if (!isApplyDiscard(project, classDiscard, "Discard class : " + ctClass.getName())) {
                                 println("[DiscardFilePlugin] -> [NOT APPLIED]Discard class : " + className)
                             } else {
-                                discardClass(ctClass, classDiscard);
-//                                ctClass.writeFile(dirPath)
+                                discardClass(ctClass, classDiscard)
+                                ctClass.writeFile(dirPath)
                                 println("[DiscardFilePlugin] -> [APPLIED]Discard class : " + className)
                             }
                         } else {
                             /*
                              * Get all of methods that has @Discard annotations
                              */
-                            CtMethod[] ctMethods = ctClass.getDeclaredMethods();
-                            int ctMethodsLength = ctMethods.length;
+                            CtMethod[] ctMethods = ctClass.getDeclaredMethods()
+                            int ctMethodsLength = ctMethods.length
                             for (int i = 0; i < ctMethodsLength; i++) {
-                                CtMethod ctMethod = ctMethods[i];
+                                CtMethod ctMethod = ctMethods[i]
                                 Discard methodDiscard = ctMethod.getAnnotation(Discard.class)
                                 if (null != methodDiscard) {
                                     if (!isApplyDiscard(project, methodDiscard, "Discard method : " + ctMethod.getLongName())) {
@@ -87,13 +86,14 @@ public class DiscardInject {
                                     }
                                     println("[DiscardFilePlugin] -> [APPLIED]Discard method : " + ctMethod.getLongName())
                                     discardMethod(ctMethod, methodDiscard)
-//                                    ctClass.writeFile(dirPath)
+                                    ctClass.writeFile(dirPath)
                                 }
                             }
 
 
                         }
-                        ctClass.writeFile(dirPath)
+                        // Cause ArrayIndexOutOfBoundException
+//                        ctClass.writeFile(dirPath)
                         ctClass.detach()
 
                     }
@@ -102,17 +102,22 @@ public class DiscardInject {
 
         }
 
+    }
 
+    private void checkDefrost(CtClass ctClass) {
+        if (ctClass.isFrozen()) {
+            ctClass.defrost()
+        }
     }
 
     private void discardClass(CtClass ctClass, @NonNull Discard discard) {
         tryMakeClasses(discard)
 
         // discard methods
-        CtMethod[] ctMethods = ctClass.getDeclaredMethods();
-        int ctMethodsLength = ctMethods.length;
+        CtMethod[] ctMethods = ctClass.getDeclaredMethods()
+        int ctMethodsLength = ctMethods.length
         for (int i = 0; i < ctMethodsLength; i++) {
-            CtMethod ctMethod = ctMethods[i];
+            CtMethod ctMethod = ctMethods[i]
             discardMethod(ctMethod, ctMethod.getAnnotation(Discard.class))
         }
     }
@@ -132,16 +137,17 @@ public class DiscardInject {
         if (null == srcCode || srcCode.length() < 2) {
             srcCode = "{ return " + getDefaultTypeValue(ctMethod.getReturnType()) + "; }"
         }
+        checkDefrost(ctMethod.getDeclaringClass())
         ctMethod.setBody(srcCode)
     }
 
     private boolean isApplyDiscard(Project project, Discard discard, String tag) {
         String apply = discard.apply()
-        String[] applyParsed;
+        String[] applyParsed
         if (!apply.contains("==") || 2 != ((applyParsed = apply.split("==")).length)) {
             throw new RuntimeException("apply expression invalidate! -> 'key==exceptValue'")
         }
-        String applyParamValue = getParameter(project, applyParsed[0].trim());
+        String applyParamValue = getParameter(project, applyParsed[0].trim())
         String applyParamExpectValue = applyParsed[1].trim()
 
         if (null == applyParamValue || applyParamExpectValue != applyParamValue) {
@@ -152,9 +158,9 @@ public class DiscardInject {
     }
 
     private void tryMakeClasses(Discard discard) {
-        String[] paramMakeClassNames = discard.makeClassNames();
+        String[] paramMakeClassNames = discard.makeClassNames()
         if (null != paramMakeClassNames) {
-            int paramMakeClassLen = paramMakeClassNames.length;
+            int paramMakeClassLen = paramMakeClassNames.length
             for (int j = 0; j < paramMakeClassLen; j++) {
                 if (null == pool.find(paramMakeClassNames[j])) {
                     pool.makeClass(paramMakeClassNames[j])

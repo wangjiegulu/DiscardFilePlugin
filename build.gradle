@@ -7,7 +7,7 @@ buildscript {
             name 'Google'
         }
         jcenter()
-        maven{
+        maven {
             url uri('/Users/wangjie/.m2/repository')
         }
     }
@@ -31,6 +31,21 @@ allprojects {
     configurations.all {
         // check for updates every build
         resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+    }
+
+    ext {
+        // ************** app configuration ************** //
+        global_compileSdkVersion = 25
+//        global_buildToolsVersion = "25.0.0"
+        global_minSdkVersion = 14
+        global_targetSdkVersion = 19
+
+        global_supportVersion = '25.0.0'
+        global_constraintlayoutVersion = '1.0.2'
+
+        // for test
+        global_junitVersion = '4.12'
+        global_espressoVersion = '2.2.2'
     }
 
 }

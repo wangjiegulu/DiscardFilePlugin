@@ -1,19 +1,21 @@
-import com.wangjie.plg.discardfile.DiscardFilePlugin
-
 apply plugin: 'com.android.library'
-apply plugin: DiscardFilePlugin
+
+//com.wangjie.myplugin为resources/META-INF/gradle-plugins
+//下的properties文件名称
+apply plugin: 'com.github.wangjiegulu.plg.discardfile'
+//apply plugin: DiscardFilePlugin
 
 discard {
     includePackagePath 'com.wangjie.plg.discardfile.sample.dep'
 }
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion global_compileSdkVersion
     buildToolsVersion '26.0.2'
 
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 25
+        minSdkVersion global_minSdkVersion
+        targetSdkVersion global_targetSdkVersion
         versionCode 1
         versionName "1.0"
 //        publishNonDefault true
@@ -30,12 +32,14 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+
+    compile "com.android.support:appcompat-v7:$global_supportVersion"
+
+    androidTestCompile("com.android.support.test.espresso:espresso-core:$global_espressoVersion") {
         exclude group: 'com.android.support', module: 'support-annotations'
-    })
+    }
 
     compile project(':discardfile-api')
 
-    compile 'com.android.support:appcompat-v7:25.0.0'
-    testCompile 'junit:junit:4.12'
+    testCompile "junit:junit:$global_junitVersion"
 }
